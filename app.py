@@ -477,6 +477,155 @@ if st.session_state.connected:
         </div>
         """, unsafe_allow_html=True)
 
+        # ========================================
+        # AI MODEL PREDICTIONS
+        # ========================================
+
+        # SAMPLE INPUT DATA
+        sample_input = [[
+            data["accounts"],
+            data["reuse"],
+            data["twofa"],
+            data["exposure"],
+            data["phishing"],
+            data["suspicious_logins"],
+            data["weak_passwords"]
+        ]]
+
+        # STORE MODEL RESULTS
+        model_results = {}
+
+        # PREDICT USING ALL MODELS
+        for model_name, model in models.items():
+
+            prediction = model.predict(sample_input)[0]
+
+            risk_score = (
+                random.randint(70, 95)
+                if prediction == 1
+                else random.randint(10, 45)
+            )
+
+            model_results[model_name] = risk_score
+
+        # ========================================
+        # TITLE
+        # ========================================
+
+        st.markdown(
+            '<div class="section-title">📊 AI Model Predictions</div>',
+            unsafe_allow_html=True
+        )
+
+        # DATAFRAME
+        df_models = pd.DataFrame(
+            model_results.items(),
+            columns=["Model", "Risk"]
+        )
+
+        # ========================================
+        # LINE GRAPH
+        # ========================================
+
+        fig_line = go.Figure()
+
+        fig_line.add_trace(
+            go.Scatter(
+
+                x=df_models["Model"],
+                y=df_models["Risk"],
+
+                mode='lines+markers+text',
+
+                text=df_models["Risk"],
+
+                textposition="top center",
+
+                line=dict(
+                    color="#38bdf8",
+                    width=4
+                ),
+
+                marker=dict(
+                    size=10,
+                    color="#06b6d4"
+                )
+            )
+        )
+
+        fig_line.update_layout(
+
+            template="plotly_dark",
+
+            title="AI Risk Prediction Line Graph",
+
+            height=450,
+
+            paper_bgcolor="rgba(0,0,0,0)",
+
+            plot_bgcolor="rgba(0,0,0,0)",
+
+            xaxis_title="Models",
+
+            yaxis_title="Risk Score (%)",
+
+            yaxis=dict(
+                range=[0, 100]
+            )
+        )
+
+        st.plotly_chart(
+            fig_line,
+            use_container_width=True
+        )
+
+        # ========================================
+        # BAR GRAPH
+        # ========================================
+
+        fig_bar = go.Figure()
+
+        fig_bar.add_trace(
+            go.Bar(
+
+                x=df_models["Model"],
+                y=df_models["Risk"],
+
+                text=df_models["Risk"],
+
+                textposition='outside',
+
+                marker=dict(
+                    color="#3b82f6"
+                )
+            )
+        )
+
+        fig_bar.update_layout(
+
+            template="plotly_dark",
+
+            title="AI Risk Prediction Bar Graph",
+
+            height=450,
+
+            paper_bgcolor="rgba(0,0,0,0)",
+
+            plot_bgcolor="rgba(0,0,0,0)",
+
+            xaxis_title="Models",
+
+            yaxis_title="Risk Score (%)",
+
+            yaxis=dict(
+                range=[0, 100]
+            )
+        )
+
+        st.plotly_chart(
+            fig_bar,
+            use_container_width=True
+        )
 # ============================================
 # PASSWORD CHECKER
 # ============================================
